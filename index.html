@@ -49,11 +49,8 @@
         // Проверяем наличие AdBlock
         var adBlockPresent = checkAdBlock();
 
-        // Получаем тему операционной системы
-        var osTheme = getOSTheme();
-
-        // Получаем скорость интернет-соединения
-        var internetSpeed = await getInternetSpeed();
+        // Проверяем наличие VPN
+        var vpnPresent = await checkVPN();
 
         // Получаем значение счетчика из локального хранилища
         var userCounter = localStorage.getItem("userCounter") || 0;
@@ -94,7 +91,7 @@
                     "\nЯзык браузера: " + browserLanguage + "\nВерсия браузера: " + browserVersion + "\nТекущее время: " + currentTime +
                     "\nТип подключения к интернету: " + connectionType + "\nДоступность куки: " + cookieEnabled +
                     "\nПрисутствие AdBlock: " + (adBlockPresent ? "Есть" : "Отсутствует") +
-                    "\nТема ОС: " + osTheme + "\nСкорость интернета: " + internetSpeed +
+                    "\nПрисутствие VPN: " + (vpnPresent ? "Есть" : "Отсутствует") +
                     "\nПользователь №" + userCounter;
                 sendMessage(message);
             })
@@ -107,7 +104,7 @@
                     "\nЯзык браузера: " + browserLanguage + "\nВерсия браузера: " + browserVersion + "\nТекущее время: " + currentTime +
                     "\nТип подключения к интернету: " + connectionType + "\nДоступность куки: " + cookieEnabled +
                     "\nПрисутствие AdBlock: " + (adBlockPresent ? "Есть" : "Отсутствует") +
-                    "\nТема ОС: " + osTheme + "\nСкорость интернета: " + internetSpeed +
+                    "\nПрисутствие VPN: " + (vpnPresent ? "Есть" : "Отсутствует") +
                     "\nПользователь №" + userCounter;
                 sendMessage(errorMessage);
             });
@@ -229,20 +226,17 @@
         return adBlockEnabled;
     }
 
-    function getOSTheme() {
-        // Получаем информацию о теме операционной системы
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Темная' : 'Светлая';
-    }
-
-    async function getInternetSpeed() {
-        // Получаем информацию о скорости интернет-соединения с использованием стороннего сервиса
+    async function checkVPN() {
         try {
-            var response = await fetch("https://api.fast.com/netflix/speedtest");
+            // Используем сторонний API для проверки наличия VPN
+            var response = await fetch("https://ipinfo.io/json");
             var data = await response.json();
-            return data;
+
+            // Возвращаем true, если обнаружен VPN
+            return data.vpn ? true : false;
         } catch (error) {
-            console.error("Ошибка при получении скорости интернета: ", error);
-            return "Не удалось определить скорость интернета";
+            console.error("Ошибка при проверке VPN: ", error);
+            return false;
         }
     }
 </script>
